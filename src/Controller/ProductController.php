@@ -32,27 +32,52 @@ final class ProductController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}', name: 'show', methods: ['GET'], requirements: ['id' => '\d+'])]
+    public function show(Product $product): Response
+    {
+        return $this->render('product/show.html.twig', [
+            'product' => $product,
+        ]);
+    }
+
     #[Route('/add', name:'add', methods: ['GET', 'POST'])]
     public function add(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $poduct = new Product();
+        $product = new Product();
 
         $form = $this->createForm(
             ProductType::class, 
-            $poduct
+            $product
         );
 
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($poduct);
+            $entityManager->persist($product);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_products_show', ['id' => $poduct->getId()]);
+            return $this->redirectToRoute('app_products_show', ['id' => $product->getId()]);
         }
 
         return $this->render('product/add.html.twig', [
             'form' => $form,
         ]);
+    }
+
+    #[Route('/{id}/delete', name: 'delete', methods: ['POST'])]
+    public function supprimer(Product $product, Request $request, EntityManagerInterface $em): Response
+    {
+        $token = $request->request->get('_token');
+
+        if ($this->isCsrfTokenValid('delete' . $product->getId(), $token)) {
+            $em->remove($product);
+            $em->flush();
+
+            $this->addFlash('success', 'Produit supprimé avec succès.');
+        } else {
+            $this->addFlash('error', 'Jeton CSRF invalide, suppression annulée.');
+        }
+
+        return $this->redirectToRoute('app_products_list');
     }
 }

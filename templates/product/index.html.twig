@@ -33,6 +33,13 @@
                 <li>Prix : {{ product.price }} €</li>
                 <li>Quantité : {{ product.quantity }}</li>
             </ul>
+
+            <form method="post"
+                action="{{ path('app_products_delete', {id: product.id}) }}"
+                onsubmit="return confirm('Voulez-vous vraiment supprimer ce produit ?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
+                <button type="submit">Supprimer</button>
+            </form>
         </div>
     {% endfor %}
 </div>
