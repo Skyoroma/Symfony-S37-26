@@ -5,12 +5,14 @@ namespace App\Repository;
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\BrowserKit\Response;
 
 /**
  * @extends ServiceEntityRepository<Product>
  */
 class ProductRepository extends ServiceEntityRepository
 {
+    private ProductRepository $productRepository;
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Product::class);
